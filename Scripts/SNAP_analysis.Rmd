@@ -1,0 +1,39 @@
+---
+title: "SNAP Participation"
+author: "Marissa Cook"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+
+data <- read_excel(path = "../Data/FoodAccessResearchAtlasData2019.xlsx",
+                   sheet = "Food Access Research Atlas")
+
+dictionary <- read_excel(path = "FoodAccessResearchAtlasData2019.xlsx",
+                    sheet = "Variable Lookup")
+
+str(data) #some numeric cols are classified as 'chr'
+
+columns_of_interest <- c("State","CensusTract", "POP2010","OHU2010",
+                         "PovertyRate", "MedianFamilyIncome", "LAPOP1_10",
+                         "LAPOP05_10", "LAPOP1_20", "LALOWI1_10",
+                         "LALOWI05_10", "LALOWI1_20", "laseniorshalf",
+                         "lahunvhalf", "lapop1", "lahunv20",
+                         "TractLOWI", "TractHUNV", "TractSNAP")
+
+data_dictionary <- filter(dictionary,dictionary$Field %in% columns_of_interest)
+
+columns_of_interest[2] = "Pop2010" #name is inconsistent across sheets
+data <- data[columns_of_interest] #filter to only select cols
+data <- filter(data, State == "Texas")
+
+data[2:18] <- as.numeric(data[2:18] )
+```
+
