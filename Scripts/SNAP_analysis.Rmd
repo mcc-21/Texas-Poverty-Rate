@@ -34,6 +34,60 @@ columns_of_interest[3] <- "Pop2010" #name is inconsistent across sheets
 data <- data[columns_of_interest] #filter to only select cols
 data <- filter(data, State == "Texas")
 
-data[3:19] <- lapply(as.numeric(data[3:19]))
- ```
+data[3:19] <- lapply(data[3:19], as.numeric)
+str(data)
+
+```
+
+
+```{r data exploration}
+dim(data)
+cat("The number of states:", length(unique(data$State)),unique(data$State))
+cat("The number of census tracks:", length(unique(data$CensusTract)))
+
+library(reshape2)
+long_data <- reshape2::melt(data, id.vars= c("State", "CensusTract"))
+
+library(ggplot2)
+histograms <- ggplot(long_data, aes(x=value))+
+                    geom_histogram()+
+                    facet_wrap(~variable, scales = "free")
+histograms
+
+boxplots <- ggplot(long_data, aes(x=value))+
+                    geom_boxplot()+
+                    facet_wrap(~variable, scales = "free")
+boxplots
+
+```
+
+
+```{r data transformation}
+
+# Calculate percentage of missing values per column
+missingPCT = sapply(data, function(x) {sum(is.na(x)) / length(x)}) * 100
+missingPCT <- round(missingPCT, 3)
+missingPCT
+#ALERT: lahunv20  HAS HIGH MISSINGNESS: 97% SO DROP THIS COLUMN
+
+data <- data %>% select(-lahunv20)
+
+#imputation: median
+median_value <- NULL
+#median imputation because there are outliers
+for (i in 3:18){
+  if (is.numeric(data[[i]])){
+    median_value <- median(data[[i]], na.rm = TRUE)
+    data[is.na(data[[i]]),i] <- median_value
+  } 
+}
+
+
+
+```
+
+
+
+
+
 
