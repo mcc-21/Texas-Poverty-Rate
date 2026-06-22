@@ -82,7 +82,37 @@ for (i in 3:18){
   } 
 }
 
+predictors <- paste(names(data[3:18] %>% select(-TractSNAP)), collapse = " + ") 
+formula <- as.formula(paste("TractSNAP ~", predictors))
+library(performance)
+vif_results <- check_collinearity(lm(formula, data = data[3:18]))
+vif_results$VIF <- format(vif_results$VIF, scientific = F) 
+vif_results$VIF <- as.numeric(vif_results$VIF) 
 
+#drop variables that have a VIF >= 10
+single_predictors <- filter(vif_results, VIF < 10)
+
+final_data <- data[single_predictors$Term]
+final_data$State <- data$State
+final_data$CensusTract <- data$CensusTract
+final_data$TractSNAP <- data$TractSNAP
+
+```
+
+
+```{r model exploration}
+
+predictors <- paste(names(final_data[1:8]), collapse = " + ") 
+formula <- as.formula(paste("TractSNAP ~", predictors))
+
+model <- lm(formula, data = final_data)
+model
+summary(model)
+
+
+#check model assumptions
+plot(model)
+confint(model)
 
 ```
 
