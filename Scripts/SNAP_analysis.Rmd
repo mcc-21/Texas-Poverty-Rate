@@ -9,14 +9,14 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r import and filter data}
 library(readxl)
 library(dplyr)
 
 data <- read_excel(path = "../Data/FoodAccessResearchAtlasData2019.xlsx",
                    sheet = "Food Access Research Atlas")
 
-dictionary <- read_excel(path = "FoodAccessResearchAtlasData2019.xlsx",
+dictionary <- read_excel(path = "../Data/FoodAccessResearchAtlasData2019.xlsx",
                     sheet = "Variable Lookup")
 
 str(data) #some numeric cols are classified as 'chr'
@@ -30,10 +30,10 @@ columns_of_interest <- c("State","CensusTract", "POP2010","OHU2010",
 
 data_dictionary <- filter(dictionary,dictionary$Field %in% columns_of_interest)
 
-columns_of_interest[2] = "Pop2010" #name is inconsistent across sheets
+columns_of_interest[3] <- "Pop2010" #name is inconsistent across sheets
 data <- data[columns_of_interest] #filter to only select cols
 data <- filter(data, State == "Texas")
 
-data[2:18] <- as.numeric(data[2:18] )
-```
+data[3:19] <- lapply(as.numeric(data[3:19]))
+ ```
 
